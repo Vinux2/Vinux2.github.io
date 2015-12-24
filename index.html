@@ -1,3 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//FR"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
-	<a href="Sapin.php"> sapin </a>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>JOYEUX NOEL</title>
+	</head>
+	<Style>
+	p {
+    	display: inline;
+	}
+
+	fieldset {
+		width: auto; margin-left: 5%; border-color: red; display: inline-block;
+	}
+
+	legend {
+		font-size: 60pt; font-weight: bold; text-align: center; color: green;
+	}
+
+	label {
+		font-size: 45pt;
+	}
+
+	img {
+		margin-top: 500pt;
+		/*margin-bottom: 20%; margin-left: 20%;*/
+	}
+
+	.nombre {
+		font-size: 40pt; margin-left: 50pt; margin-bottom: 20pt; 
+	}
+
+	.submit {
+		margin-left: auto; margin-right: auto;
+	}
+
+	.tailleInput {
+		font-size: 60pt;
+	}
+	</Style>
+	<body>
+
+		<form method = "get" action = "Sapin.php">
+			<fieldset > <legend> Génération du sapin </legend> 
+				<table border="0">
+				<tr>
+					<td><label for="v1"> Nombre de branche : 	</label></td>
+					<td><input class="nombre" type = "number" name = "v1" 
+						value =
+						"<?php 
+							if (isset($_GET['reset']))
+							{
+								echo '6';
+							} 
+							else if (isset($_GET['v1']))
+							{
+								echo $_GET['v1'];
+							} 
+							else echo '6';
+						?>" 
+					/></td>
+				</tr>
+				<tr>
+					<td><label for="v2"> Taille d'une branche : </label></td>
+					<td><input class="nombre" type = "number" name = "v2" 
+						value =
+						"<?php 
+							if (isset($_GET['reset']))
+							{
+								echo '16';
+							} 
+							else if (isset($_GET['v2']))
+							{
+								echo $_GET['v2'];
+							} 
+							else echo '16';
+						?>" 
+					/></td>
+				</tr>
+				<tr>
+					<td><label for="v3"> Epaisseur : 			</label></td>
+					<td><input class="nombre" type = "number" name = "v3" 
+						value =
+						"<?php 
+							if (isset($_GET['reset']))
+							{
+								echo '20';
+							} 
+							else if (isset($_GET['v3']))
+							{
+								echo $_GET['v3'];
+							} 
+							else echo '20';
+						?>" 
+					/></td>
+				</tr>
+				<tr>
+					<td><label for="v4"> Inclinaison : 			</label></td>
+					<td><input class="nombre" type = "number" name = "v4" 
+						value =
+						"<?php 
+							if (isset($_GET['reset']))
+							{
+								echo '2';
+							} 
+							else if (isset($_GET['v4']))
+							{
+								echo $_GET['v4'];
+							} 
+							else echo '2';
+						?>" 
+					/></td>
+				</tr>
+				</table>
+				<div class="submit">
+					<input  class="tailleInput" type = "submit" value = "Planter">
+					<input  class="tailleInput" type = "submit" name = "reset" value = "Réinitialiser">
+				</div>
+			</fieldset>
+		</form>
+
+		<?php
+
+	//n est le nombre de branche du sapin.
+	//taille est la hauteur de la branche.
+	//epaisseur est la proportion d'étoile ajoutée à chaque nouvelle branche (rendant l'arbre plus épais).
+	//inclinaison est le nombre d'étoile par ligne en plus.
+	function Sapin($n,$taille,$epaisseur,$inclinaison)
+	{
+		$vide = $taille*$inclinaison*$n - ( $taille*$inclinaison - ($epaisseur) )*($n-1); 		//calcul des vides pour construire le sapin entier
+		/*for ($i = 0; $i< $vide; $i++)
+			echo "&#8194";							//espace pris en compte (de même dimension que l'étoile)
+		echo '<p style="color:gold">*</p>'."<br/>";*/
+		etoile($vide);
+		for ($i = 0; $i< $vide; $i++)
+			echo "&#8194";							//espace pris en compte (de même dimension que l'étoile)
+		echo '<p style="color:green">*</p>'."<br/>";
+		for ($i = 0; $i<$n; $i++)										
+		{
+			branche($taille,$epaisseur,$i,$inclinaison,$vide);
+		}
+		tronc($epaisseur,$epaisseur,$vide);
+	}
+
+
+
+
+	//position permet de gérer l'avancement de la branche par rapport au centre du sapin. Il s'agit en fait de la branche que l'on construit (0 étant le sommet et n la base)
+	function branche($taille,$epaisseur,$position,$inclinaison,$vide)
+	{
+		for ($j = 1; $j <= $taille; $j++)							
+		{
+			for ($k = 0; $k< $vide-$j*$inclinaison-$epaisseur*$position; $k++)
+				echo "&#8194";								//espace pris en compte (de même dimension que l'étoile)
+			/*if (fmod($j, 2) == 0) echo '<p  style="color:green">';
+			else echo '<p style="color:red">';*/
+			echo '<p style="color:green">';
+			$cpt = 0;												//initialisation du compteur pour placer la guirlande.
+			$max = $epaisseur*$position*2 + $j + $inclinaison*2;	//épaisseur totale de la ligne
+			$pourcent = ($taille - $j + 1)/$taille;					//pourcentage pour placer les éléments en couleur sur cette ligne (au début, à la fin ou quelque part au milieu)
+			$nombre = $max/$taille;									//nombre d'étoiles concernée pour cette ligne.
+			$nombre_max = ($j-1)*$nombre;							//permet d'épaissire la guirlande.
+			if ($j-1 >2) $nombre_max = 2*$nombre;
+			for ($k = 0; $k<=$epaisseur*$position*2; $k++)						
+			{
+				$cpt++;
+				if ($cpt > $pourcent*$max-$nombre && $cpt <= $pourcent*$max+$nombre_max && $position != 0)
+				{
+					echo '</p><p  style="color:red">*</p><p style="color:green">';
+				}
+				else echo "*";
+			}
+			for ($k = 0; $k < $j; $k++)								
+			{
+				for ($l = 1; $l<=$inclinaison*2; $l++)
+				{	
+					$cpt++;
+					if ($cpt > $pourcent*$max-$nombre && $cpt <= $pourcent*$max+$nombre_max && $position != 0)
+					{
+						echo '</p><p  style="color:red">*</p><p style="color:green">';
+					}
+					else echo "*";
+				}
+			}
+			echo "</p>";
+			echo "<br/>";
+		}
+	}
+
+
+
+	function tronc($hauteur,$epaisseur,$vide)
+	{
+		echo '<p style="color:brown">';
+		for ($i = 0; $i<$hauteur; $i++)
+		{
+			for ($j = 0; $j< $vide-$epaisseur; $j++)
+				echo "&#8194";							//espace pris en compte (de même dimension que l'étoile)
+			for ($j = 0; $j<$epaisseur*2; $j++)
+				echo "#";
+			echo "<br/>";
+		}
+		echo '</p>';
+		echo "<br/>";
+	}
+
+
+
+
+	function etoile($vide)
+	{
+		echo '<p style="color:gold">';
+		for ($i = 0; $i< 3; $i++)
+		{
+			for ($j = 0; $j< $vide-$i; $j++)
+				echo "&#8194";							//espace pris en compte (de même dimension que l'étoile)
+			for ($j = 0; $j< 2*$i+1; $j++)
+				echo "*";
+			echo "<br/>";
+		}
+
+		for ($i = 0; $i< 4; $i++)
+		{
+			for ($j = 0; $j< $vide-10+2*$i; $j++)
+				echo "&#8194";							
+			for ($j = 0; $j< 21-4*$i; $j++)
+				echo "*";
+			echo "<br/>";
+		}
+
+			for ($j = 0; $j< $vide-6; $j++)
+				echo "&#8194";							
+			for ($j = 0; $j< 13; $j++)
+				echo "*";
+			echo "<br/>";
+
+			for ($j = 0; $j< $vide-7; $j++)
+				echo "&#8194";							
+			for ($j = 0; $j< 6; $j++)
+				echo "*";
+			for ($j = 0; $j< 3; $j++)
+				echo "&#8194";							
+			for ($j = 0; $j< 6; $j++)
+				echo "*";
+			echo "<br/>";
+
+			for ($j = 0; $j< $vide-8; $j++)
+				echo "&#8194";							
+			for ($j = 0; $j< 5; $j++)
+				echo "*";
+			for ($j = 0; $j< 7; $j++)
+				echo "&#8194";							
+			for ($j = 0; $j< 5; $j++)
+				echo "*";
+			echo "<br/>";
+
+			for ($j = 0; $j< $vide-9; $j++)
+				echo "&#8194";							
+			for ($j = 0; $j< 3; $j++)
+				echo "*";
+			for ($j = 0; $j< 13; $j++)
+				echo "&#8194";							
+			for ($j = 0; $j< 3; $j++)
+				echo "*";
+			echo "<br/>";
+		echo '</p>';
+	}
+
+			Sapin($_GET['v1'],$_GET['v2'],$_GET['v3'],$_GET['v4']);
+
+			echo "<div><p><img src='alicecoopermerrychristmas.gif' style='width:2000.5px;height:1490px;'/></p></div>";
+		
+		?>
+
+	</body>
 </html>
